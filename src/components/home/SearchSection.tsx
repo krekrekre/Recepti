@@ -21,7 +21,7 @@ export function SearchSection() {
               Šta biste želeli da skuvate?
             </h2>
             <form action="/recepti" method="GET" className="mt-4">
-              <div className="flex overflow-hidden rounded-lg border border-[var(--color-primary)]">
+              <div className="flex overflow-hidden rounded-none border border-[var(--color-primary)]">
                 <input
                   type="search"
                   name="sastojak"
@@ -31,7 +31,7 @@ export function SearchSection() {
                 />
                 <button
                   type="submit"
-                  className="flex w-12 shrink-0 items-center justify-center bg-[var(--ar-primary)] text-white transition-colors hover:bg-[var(--ar-primary-hover)]"
+                  className="flex w-12 shrink-0 cursor-pointer items-center justify-center bg-[var(--ar-primary)] text-white transition-colors hover:bg-[var(--ar-primary-hover)]"
                   aria-label="Pretraži"
                 >
                   <Search className="h-5 w-5" />
@@ -50,8 +50,7 @@ export function SearchSection() {
                 <Link
                   key={s.slug}
                   href={`/recepti?sastojak=${encodeURIComponent(s.label)}`}
-                  style={{ color: "#f1f1e6" }}
-                  className="rounded-none bg-[var(--ar-primary)] px-3 py-2 text-center text-xs font-medium transition-colors hover:opacity-90 sm:text-sm"
+                  className="rounded-none bg-[var(--ar-primary)] px-3 py-2 text-center text-xs font-medium text-[var(--color-primary)] transition-colors hover:opacity-90 sm:text-sm"
                 >
                   {s.label}
                 </Link>

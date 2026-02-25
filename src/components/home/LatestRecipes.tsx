@@ -19,9 +19,11 @@ export function LatestRecipes({ recipes }: LatestRecipesProps) {
     <section className="border-b border-[var(--ar-gray-200)] bg-[#f1f1e6] pt-[7vh] pb-[7vh]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="text-2xl font-bold text-[var(--ar-gray-700)]">
-            Najnovije
-          </h2>
+          <div className="mb-4 border-b-4 border-[var(--ar-primary)]">
+            <h2 className="font-dynapuff text-2xl font-medium leading-tight tracking-tight text-[var(--color-primary)] sm:text-[36px] mb-0">
+              Najnovije
+            </h2>
+          </div>
           <Link
             href="/recepti?sort=latest"
             className="text-sm font-semibold text-[var(--ar-primary)] hover:text-[var(--ar-primary-hover)] hover:underline"

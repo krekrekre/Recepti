@@ -3,7 +3,9 @@
 import { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { PLACEHOLDER_IMAGES } from "@/lib/constants";
+import { getSavedRecipeIds, toggleSavedRecipe } from "@/lib/saved-recipes";
 import { RotateCcw, ChevronLeft, ChevronRight, Heart } from "lucide-react";
 
 // Category tags – yellow-orange banner style (top-left on image)
@@ -28,7 +30,10 @@ function formatTime(minutes: number) {
 function StarRating({ avg }: { avg: number }) {
   const full = Math.min(5, Math.floor(avg));
   return (
-    <span className="inline-flex gap-0.5 text-[var(--color-primary)]" aria-hidden>
+    <span
+      className="inline-flex gap-0.5 text-[var(--color-primary)]"
+      aria-hidden
+    >
       {[...Array(5)].map((_, i) => (
         <svg
           key={i}
@@ -63,6 +68,20 @@ export function FeaturedRecipeCards({ recipes }: FeaturedRecipeCardsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    getSavedRecipeIds().then(setSavedIds);
+  }, []);
+
+  const onToggleSave = (recipeId: string, saved: boolean) => {
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (saved) next.add(recipeId);
+      else next.delete(recipeId);
+      return next;
+    });
+  };
 
   const updateScrollState = () => {
     const el = scrollRef.current;
@@ -94,7 +113,7 @@ export function FeaturedRecipeCards({ recipes }: FeaturedRecipeCardsProps) {
         {/* Top row: heading (left), arrows (right) */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <h2 className="font-dynapuff text-xl font-semibold text-[var(--color-primary)] sm:text-2xl">
+            <h2 className="font-dynapuff text-[30px] font-semibold text-[var(--color-primary)]">
               Počnite da čuvate ova jela
             </h2>
             <p className="mt-1 text-sm text-[var(--ar-gray-500)]">
@@ -107,7 +126,7 @@ export function FeaturedRecipeCards({ recipes }: FeaturedRecipeCardsProps) {
                 type="button"
                 onClick={() => scroll("left")}
                 disabled={!canScrollLeft}
-                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--color-primary)] bg-white text-[var(--color-accent)] shadow-sm transition-opacity disabled:opacity-40 hover:enabled:bg-[var(--ar-gray-100)]"
+                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--color-primary)] bg-white text-[var(--color-accent)] shadow-sm transition-all duration-200 disabled:opacity-40 hover:enabled:scale-105 hover:enabled:bg-[var(--ar-primary)] hover:enabled:text-white hover:enabled:border-[var(--ar-primary)]"
                 aria-label="Prethodne kartice"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -116,7 +135,7 @@ export function FeaturedRecipeCards({ recipes }: FeaturedRecipeCardsProps) {
                 type="button"
                 onClick={() => scroll("right")}
                 disabled={!canScrollRight}
-                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--color-primary)] bg-white text-[var(--color-accent)] shadow-sm transition-opacity disabled:opacity-40 hover:enabled:bg-[var(--ar-gray-100)]"
+                className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-[var(--color-primary)] bg-white text-[var(--color-accent)] shadow-sm transition-all duration-200 disabled:opacity-40 hover:enabled:scale-105 hover:enabled:bg-[var(--ar-primary)] hover:enabled:text-white hover:enabled:border-[var(--ar-primary)]"
                 aria-label="Sledeće kartice"
               >
                 <ChevronRight className="h-5 w-5" />
@@ -136,9 +155,18 @@ export function FeaturedRecipeCards({ recipes }: FeaturedRecipeCardsProps) {
               key={recipe.id}
               recipe={recipe}
               tag={FEATURED_TAGS[idx % FEATURED_TAGS.length]}
+              savedIds={savedIds}
+              onToggleSave={onToggleSave}
             />
           ))}
         </div>
+
+        {recipes.length > 0 && (
+          <p className="mt-4 flex items-center justify-center gap-2 text-[18px] text-[var(--ar-gray-500)]">
+            Klikni da preokrenes
+            <RotateCcw className="h-5 w-5 shrink-0" aria-hidden />
+          </p>
+        )}
 
         {recipes.length === 0 && (
           <p className="py-12 text-center text-[var(--ar-gray-500)]">
@@ -153,13 +181,40 @@ export function FeaturedRecipeCards({ recipes }: FeaturedRecipeCardsProps) {
 function FeaturedFlipCard({
   recipe,
   tag,
+  savedIds,
+  onToggleSave,
 }: {
   recipe: FeaturedRecipe;
   tag: string;
+  savedIds: Set<string>;
+  onToggleSave: (recipeId: string, saved: boolean) => void;
 }) {
+  const router = useRouter();
   const [flipped, setFlipped] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const isSaved = savedIds.has(recipe.id);
   const totalTime = recipe.prep_time_minutes + recipe.cook_time_minutes;
   const cardWidth = 260;
+  const heartColor = isSaved
+    ? "var(--ar-primary)"
+    : isHovered
+      ? "var(--ar-primary)"
+      : "var(--color-primary)";
+
+  const handleSaveClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (saving) return;
+    setSaving(true);
+    const result = await toggleSavedRecipe(recipe.id);
+    setSaving(false);
+    if (result === null) {
+      router.push("/login?next=" + encodeURIComponent(window.location.pathname));
+      return;
+    }
+    onToggleSave(recipe.id, result);
+  };
 
   return (
     <div
@@ -168,13 +223,13 @@ function FeaturedFlipCard({
       onClick={() => setFlipped((f) => !f)}
     >
       <div
-        className={`relative h-[340px] transition-transform duration-500 [transform-style:preserve-3d] ${
+        className={`relative h-[380px] transition-transform duration-500 [transform-style:preserve-3d] ${
           flipped ? "[transform:rotateY(180deg)]" : ""
         }`}
       >
         {/* Front – match image: white card, tag top-left, title, stars+count, time, Save button */}
-        <div className="absolute inset-0 flex flex-col overflow-hidden border border-[var(--ar-gray-200)] bg-white shadow-[var(--ar-card-shadow)] [backface-visibility:hidden]">
-          <div className="relative aspect-square shrink-0 overflow-hidden bg-[var(--ar-gray-100)]">
+        <div className="absolute inset-0 flex min-h-0 flex-col overflow-hidden border border-[var(--ar-gray-200)] bg-white shadow-[var(--ar-card-shadow)] [backface-visibility:hidden]">
+          <div className="relative h-[168px] shrink-0 overflow-hidden bg-[var(--ar-gray-100)]">
             <Image
               src={recipe.image_url || PLACEHOLDER_IMAGES.default}
               alt={recipe.title_sr}
@@ -186,33 +241,48 @@ function FeaturedFlipCard({
               {tag}
             </span>
           </div>
-          <div className="flex flex-1 flex-col p-4">
-            <h3 className="font-semibold text-[var(--color-primary)] line-clamp-2">
+          <div className="flex flex-1 flex-col p-3">
+            <h3 className="text-[23px] font-semibold leading-tight text-[var(--color-primary)] line-clamp-2">
               {recipe.title_sr}
             </h3>
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--ar-gray-500)]">
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--ar-gray-500)]">
               {recipe.rating_count > 0 && (
                 <>
-                  {recipe.rating_avg != null && <StarRating avg={recipe.rating_avg} />}
+                  {recipe.rating_avg != null && (
+                    <StarRating avg={recipe.rating_avg} />
+                  )}
                   <span>({recipe.rating_count})</span>
                 </>
               )}
               <span className="flex items-center gap-1">
-                <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  className="h-4 w-4 shrink-0"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <circle cx="12" cy="12" r="10" />
                   <path d="M12 6v6l4 2" />
                 </svg>
                 {formatTime(totalTime)}
               </span>
             </div>
-            <div className="mt-auto pt-4">
+            <div className="mt-auto pt-2">
               <Link
                 href="/moji-recepti"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--color-primary)] bg-white py-2.5 text-sm font-medium text-[var(--color-primary)] transition-colors hover:bg-[var(--ar-gray-100)]"
-                onClick={(e) => e.stopPropagation()}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-none border border-[var(--color-primary)] bg-white py-2.5 text-[16px] font-bold text-[var(--color-primary)] transition-all duration-200 hover:scale-105 hover:bg-[var(--ar-gray-100)]"
+                onClick={handleSaveClick}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
               >
-                Sačuvaj recept
-                <Heart className="h-4 w-4 shrink-0" />
+                {saving ? "..." : "Sačuvaj recept"}
+                <Heart
+                  className="h-4 w-4 shrink-0 transition-colors"
+                  fill={isSaved ? heartColor : "none"}
+                  stroke={heartColor}
+                  strokeWidth={isSaved ? 0 : 2}
+                />
               </Link>
             </div>
           </div>
@@ -221,14 +291,16 @@ function FeaturedFlipCard({
         {/* Back – quote */}
         <div className="absolute inset-0 flex flex-col justify-between border border-[var(--ar-gray-200)] bg-[var(--ar-primary-light)] p-5 shadow-[var(--ar-card-shadow)] [backface-visibility:hidden] [transform:rotateY(180deg)]">
           <p className="line-clamp-4 text-[var(--color-primary)] italic">
-            &ldquo;{recipe.review_quote || "Ovaj recept je preporuka zajednice."}&rdquo;
+            &ldquo;
+            {recipe.review_quote || "Ovaj recept je preporuka zajednice."}
+            &rdquo;
           </p>
           <cite className="block text-sm text-[var(--ar-gray-500)] not-italic">
             — {recipe.author_name || "Domaći kuvar"}
           </cite>
           <Link
             href={`/recepti/${recipe.slug}`}
-            className="flex items-center justify-center gap-2 rounded-lg bg-[var(--color-accent)] py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
+            className="flex items-center justify-center gap-2 rounded-none bg-[var(--color-accent)] py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
             onClick={(e) => e.stopPropagation()}
           >
             <RotateCcw className="h-4 w-4" />

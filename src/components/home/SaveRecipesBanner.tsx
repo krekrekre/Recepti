@@ -16,7 +16,7 @@ export function SaveRecipesBanner() {
               Kreirajte nalog besplatno i sačuvajte omiljene recepte na jednom mestu.
             </p>
           </div>
-          <Button asChild size="lg" className="shrink-0 rounded-xl">
+          <Button asChild size="lg" className="shrink-0 rounded-none">
             <Link href="/signup" style={{ color: "#f1f1e6" }}>
               Registruj se
             </Link>

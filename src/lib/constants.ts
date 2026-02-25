@@ -10,7 +10,7 @@ export const PLACEHOLDER_IMAGES = {
     "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
   soup: "https://images.unsplash.com/photo-1547592166-23ac45744acd?w=800&q=80",
   salad: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80",
-  dessert: "https://images.unsplash.com/photo-1563729784474-d77ddb933c9e?w=800&q=80",
+  dessert: "https://images.unsplash.com/photo-1606787366850-de6330128bfc?w=800&q=80",
   default:
     "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800&q=80",
 } as const;

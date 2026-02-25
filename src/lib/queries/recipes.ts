@@ -243,7 +243,8 @@ export async function getRecipeBySlug(slug: string) {
   const { count: reviewCount } = await supabase
     .from("reviews")
     .select("*", { count: "exact", head: true })
-    .eq("recipe_id", recipeId);
+    .eq("recipe_id", recipeId)
+    .eq("status", "approved");
 
   return {
     ...recipe,
@@ -279,11 +280,12 @@ export async function getFeaturedRecipesWithReviews(limit = 6) {
 
   const recipeIds = recipes.map((r) => r.id);
 
-  // Fetch one review per recipe (first by created_at)
+  // Fetch one review per recipe (first by created_at), approved only
   const { data: reviews } = await supabase
     .from("reviews")
     .select("recipe_id, content")
     .in("recipe_id", recipeIds)
+    .eq("status", "approved")
     .order("created_at", { ascending: false });
 
   const reviewByRecipe: Record<string, string> = {};

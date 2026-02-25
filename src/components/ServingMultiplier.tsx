@@ -51,7 +51,7 @@ export function ServingMultiplier({
         <button
           type="button"
           onClick={() => setMult(0.5)}
-          className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-none px-3 py-1.5 text-sm font-medium transition-colors ${
             mult === 0.5 ? "bg-[var(--ar-primary)] text-white" : "bg-[var(--ar-gray-100)] text-[var(--ar-gray-700)] hover:bg-[var(--ar-gray-200)]"
           }`}
         >
@@ -60,7 +60,7 @@ export function ServingMultiplier({
         <button
           type="button"
           onClick={() => setMult(1)}
-          className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-none px-3 py-1.5 text-sm font-medium transition-colors ${
             mult === 1 ? "bg-[var(--ar-primary)] text-white" : "bg-[var(--ar-gray-100)] text-[var(--ar-gray-700)] hover:bg-[var(--ar-gray-200)]"
           }`}
         >
@@ -69,7 +69,7 @@ export function ServingMultiplier({
         <button
           type="button"
           onClick={() => setMult(2)}
-          className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+          className={`rounded-none px-3 py-1.5 text-sm font-medium transition-colors ${
             mult === 2 ? "bg-[var(--ar-primary)] text-white" : "bg-[var(--ar-gray-100)] text-[var(--ar-gray-700)] hover:bg-[var(--ar-gray-200)]"
           }`}
         >
@@ -81,10 +81,15 @@ export function ServingMultiplier({
       </div>
       <ul className="mt-4 space-y-2 text-base sm:text-[18px]">
         {sorted.map((ing) => (
-          <li key={ing.id} className="flex gap-2">
+          <li key={ing.id} className="flex flex-wrap gap-x-2 gap-y-0">
             {ing.amount && (
               <span className="text-base text-[var(--ar-gray-500)] sm:text-[18px]">
                 {multiplyAmount(ing.amount, mult)}
+              </span>
+            )}
+            {"unit_sr" in ing && (ing as { unit_sr?: string }).unit_sr && (
+              <span className="text-base text-[var(--ar-gray-500)] sm:text-[18px]">
+                {(ing as { unit_sr: string }).unit_sr}
               </span>
             )}
             <span className="text-base text-[var(--ar-gray-700)] sm:text-[18px]">{ing.name_sr}</span>

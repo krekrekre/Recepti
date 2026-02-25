@@ -22,7 +22,7 @@ export function TopicHubs() {
   return (
     <section className="border-b border-[var(--ar-gray-200)] bg-white py-12">
       <div className="mx-auto max-w-[1220px]">
-        <h2 className="text-2xl font-bold text-[var(--ar-gray-700)]">
+        <h2 className="text-[30px] font-bold text-[var(--ar-gray-700)]">
           Istražite kategorije
         </h2>
         <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

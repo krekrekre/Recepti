@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ function Section({
 }) {
   return (
     <section
-      className={`rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm ${className}`}
+      className={`rounded-none border-2 border-gray-200 bg-white p-6 shadow-sm ${className}`}
     >
       <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[var(--color-primary)]">
         {title}
@@ -83,10 +84,9 @@ function FormField({
 }
 
 const inputClass =
-  "w-full rounded-xl border-2 border-gray-300 bg-[#f1f1e6] px-4 py-3 text-[15px] text-[var(--color-primary)] placeholder:text-gray-500 focus:border-[var(--color-orange)] focus:bg-[#f1f1e6] focus:ring-2 focus:ring-[var(--color-orange)]/25 outline-none transition-all";
+  "w-full rounded-none border-2 border-gray-300 bg-[#f1f1e6] px-4 py-3 text-[15px] text-[var(--color-primary)] placeholder:text-gray-500 outline-none transition-all focus:bg-[#f1f1e6] focus-visible:border-[var(--color-orange)] focus-visible:ring-2 focus-visible:ring-[var(--color-orange)]/25";
 const inputClassSmall =
-  "rounded-lg border-2 border-gray-300 bg-[#f1f1e6] px-3 py-2 text-sm text-[var(--color-primary)] placeholder:text-gray-500 focus:border-[var(--color-orange)] focus:bg-[#f1f1e6] focus:ring-2 focus:ring-[var(--color-orange)]/25 outline-none transition-all";
-const selectClass = inputClass + " cursor-pointer appearance-none bg-[#f1f1e6]";
+  "rounded-none border-2 border-gray-300 bg-[#f1f1e6] px-3 py-2 text-sm text-[var(--color-primary)] placeholder:text-gray-500 outline-none transition-all focus:bg-[#f1f1e6] focus-visible:border-[var(--color-orange)] focus-visible:ring-2 focus-visible:ring-[var(--color-orange)]/25";
 
 function CustomSelect({
   value,
@@ -112,7 +112,8 @@ function CustomSelect({
   useEffect(() => {
     if (!open) return;
     const onOutside = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node))
+        setOpen(false);
     };
     document.addEventListener("click", onOutside);
     return () => document.removeEventListener("click", onOutside);
@@ -120,7 +121,10 @@ function CustomSelect({
 
   return (
     <div className="space-y-2">
-      <label htmlFor={id} className="block text-sm font-medium text-[var(--color-primary)]">
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-[var(--color-primary)]"
+      >
         {label}
         {required && <span className="text-[var(--color-orange)]"> *</span>}
       </label>
@@ -133,7 +137,11 @@ function CustomSelect({
           aria-expanded={open}
           aria-haspopup="listbox"
         >
-          <span className={selected ? "text-[var(--color-primary)]" : "text-gray-500"}>
+          <span
+            className={
+              selected ? "text-[var(--color-primary)]" : "text-gray-500"
+            }
+          >
             {selected ? selected.label : placeholder}
           </span>
           <svg
@@ -142,12 +150,17 @@ function CustomSelect({
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </button>
         <div
           role="listbox"
-          className={`absolute left-0 right-0 top-full z-50 mt-1 overflow-visible rounded-xl border-2 border-gray-200 bg-white py-1 shadow-lg origin-top transition-all duration-200 ease-out ${
+          className={`absolute left-0 right-0 top-full z-50 mt-1 overflow-visible rounded-none border-2 border-gray-200 bg-white py-1 shadow-lg origin-top transition-all duration-200 ease-out ${
             open
               ? "translate-y-0 opacity-100"
               : "pointer-events-none -translate-y-1 opacity-0"
@@ -156,11 +169,12 @@ function CustomSelect({
           <button
             type="button"
             role="option"
+            aria-selected={!value}
             onClick={() => {
               onChange("");
               setOpen(false);
             }}
-            className={`w-full px-4 py-2.5 text-left text-sm hover:bg-[#f1f1e6] ${!value ? "bg-[#f1f1e6] font-medium" : "text-[var(--color-primary)]"}`}
+            className={`w-full cursor-pointer px-4 py-2.5 text-left text-sm hover:bg-[#f1f1e6] ${!value ? "bg-[#f1f1e6] font-medium" : "text-[var(--color-primary)]"}`}
           >
             {placeholder}
           </button>
@@ -169,11 +183,12 @@ function CustomSelect({
               key={opt.value}
               type="button"
               role="option"
+              aria-selected={value === opt.value}
               onClick={() => {
                 onChange(opt.value);
                 setOpen(false);
               }}
-              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-[#f1f1e6] ${value === opt.value ? "bg-[#f1f1e6] font-medium" : "text-[var(--color-primary)]"}`}
+              className={`w-full cursor-pointer px-4 py-2.5 text-left text-sm hover:bg-[#f1f1e6] ${value === opt.value ? "bg-[#f1f1e6] font-medium" : "text-[var(--color-primary)]"}`}
             >
               {opt.label}
             </button>
@@ -196,7 +211,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
   const [cookTime, setCookTime] = useState<number | "">("");
   const [servings, setServings] = useState<number | "">("");
   const [skillLevel, setSkillLevel] = useState<string>("");
-  const [status, setStatus] = useState<"published">("published");
+  const [status] = useState<"published">("published");
   const [categoryId, setCategoryId] = useState<string>("");
   const [cuisineId, setCuisineId] = useState<string>("");
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -208,7 +223,8 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
   const whyYoullLoveRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const setImageFileWithPreview = useCallback((file: File | null) => {
-    if (prevPreviewUrlRef.current) URL.revokeObjectURL(prevPreviewUrlRef.current);
+    if (prevPreviewUrlRef.current)
+      URL.revokeObjectURL(prevPreviewUrlRef.current);
     prevPreviewUrlRef.current = null;
     setImageFile(file);
     if (file) {
@@ -231,9 +247,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
   const [ingredients, setIngredients] = useState<
     Array<{ amount: string; unit: string; name: string }>
   >([{ amount: "", unit: "", name: "" }]);
-  const [directions, setDirections] = useState<Array<{ text: string; imageFile: File | null; imagePreviewUrl?: string }>>([
-    { text: "", imageFile: null },
-  ]);
+  const [directions, setDirections] = useState<
+    Array<{ text: string; imageFile: File | null; imagePreviewUrl?: string }>
+  >([{ text: "", imageFile: null }]);
 
   const addIngredient = useCallback(() => {
     setIngredients((prev) => [...prev, { amount: "", unit: "", name: "" }]);
@@ -267,19 +283,17 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
         }
       }
     },
-    [ingredients, addIngredient, focusIngredient]
+    [ingredients, addIngredient, focusIngredient],
   );
   const removeIngredient = (i: number) =>
     setIngredients((prev) => prev.filter((_, idx) => idx !== i));
   const updateIngredient = (
     i: number,
     field: "amount" | "unit" | "name",
-    value: string
+    value: string,
   ) => {
     setIngredients((prev) =>
-      prev.map((item, idx) =>
-        idx === i ? { ...item, [field]: value } : item
-      )
+      prev.map((item, idx) => (idx === i ? { ...item, [field]: value } : item)),
     );
   };
 
@@ -302,13 +316,13 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
         }
       }
     },
-    [directions, addDirection, focusDirection]
+    [directions, addDirection, focusDirection],
   );
   const removeDirection = (i: number) =>
     setDirections((prev) => prev.filter((_, idx) => idx !== i));
   const updateDirection = (i: number, value: string) =>
     setDirections((prev) =>
-      prev.map((item, idx) => (idx === i ? { ...item, text: value } : item))
+      prev.map((item, idx) => (idx === i ? { ...item, text: value } : item)),
     );
   const focusWhyYoullLove = useCallback((idx: number) => {
     setTimeout(() => whyYoullLoveRefs.current[idx]?.focus(), 50);
@@ -322,12 +336,15 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
       } else if (whyYoullLove.length < 3) {
         setWhyYoullLove((prev) => {
           const next = [...prev, ""];
-          setTimeout(() => whyYoullLoveRefs.current[next.length - 1]?.focus(), 50);
+          setTimeout(
+            () => whyYoullLoveRefs.current[next.length - 1]?.focus(),
+            50,
+          );
           return next;
         });
       }
     },
-    [whyYoullLove.length, focusWhyYoullLove]
+    [whyYoullLove.length, focusWhyYoullLove],
   );
   const setDirectionImage = (i: number, file: File | null) =>
     setDirections((prev) => {
@@ -368,11 +385,14 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
       setLoading(false);
       return;
     }
-    const prep = typeof prepTime === "number" ? prepTime : (parseInt(String(prepTime)) || 0);
-    const cook = typeof cookTime === "number" ? cookTime : (parseInt(String(cookTime)) || 0);
-    const serv = typeof servings === "number" ? servings : (parseInt(String(servings)) || 1);
-    if (prep <= 0 && cook <= 0) {
-      setError("Unesite vreme pripreme ili kuvanja.");
+    const prep =
+      typeof prepTime === "number" ? prepTime : parseInt(String(prepTime)) || 0;
+    const cook =
+      typeof cookTime === "number" ? cookTime : parseInt(String(cookTime)) || 0;
+    const serv =
+      typeof servings === "number" ? servings : parseInt(String(servings)) || 1;
+    if (prep <= 0) {
+      setError("Unesite vreme pripreme (min).");
       setLoading(false);
       return;
     }
@@ -399,6 +419,10 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
 
     try {
       const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      const authorName =
+        (user?.user_metadata?.display_name as string)?.trim() || null;
+
       let imageUrl: string | null = null;
       if (imageFile) {
         const ext = imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -434,6 +458,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
           cook_time_minutes: cook,
           servings: serv,
           author_id: userId,
+          author_name: authorName,
           image_url: imageUrl,
           status,
           skill_level: skillLevel || null,
@@ -472,14 +497,22 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
         const stepData = filteredDirections[i];
         let imageUrl: string | null = null;
         if (stepData.imageFile) {
-          const ext = stepData.imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
-          const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
+          const ext =
+            stepData.imageFile.name.split(".").pop()?.toLowerCase() || "jpg";
+          const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext)
+            ? ext
+            : "jpg";
           const path = `${userId}/${recipe.id}/step-${i}.${safeExt}`;
           const { error: upErr } = await supabase.storage
             .from("recipe-images")
-            .upload(path, stepData.imageFile, { upsert: true, cacheControl: "3600" });
+            .upload(path, stepData.imageFile, {
+              upsert: true,
+              cacheControl: "3600",
+            });
           if (!upErr) {
-            const { data: urlData } = supabase.storage.from("recipe-images").getPublicUrl(path);
+            const { data: urlData } = supabase.storage
+              .from("recipe-images")
+              .getPublicUrl(path);
             imageUrl = urlData.publicUrl;
           }
         }
@@ -504,7 +537,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
           categoryIds.map((category_id) => ({
             recipe_id: recipe.id,
             category_id,
-          }))
+          })),
         );
       }
 
@@ -546,7 +579,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
       }}
     >
       {error && (
-        <div className="rounded-2xl border-2 border-red-200 bg-red-50 p-4 text-sm text-red-800">
+        <div className="rounded-none border-2 border-red-200 bg-red-50 p-4 text-sm text-red-800">
           {error}
         </div>
       )}
@@ -573,8 +606,10 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                     <button
                       key={s.value}
                       type="button"
-                      onClick={() => setSkillLevel(skillLevel === s.value ? "" : s.value)}
-                      className={`rounded-xl border-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                      onClick={() =>
+                        setSkillLevel(skillLevel === s.value ? "" : s.value)
+                      }
+                      className={`cursor-pointer rounded-none border-2 px-4 py-2.5 text-sm font-medium transition-colors ${
                         skillLevel === s.value
                           ? "border-[var(--color-orange)] bg-[var(--color-orange)] text-white"
                           : "border-gray-300 bg-[#f1f1e6] text-[var(--color-primary)] hover:border-[var(--color-orange)]/50"
@@ -592,22 +627,27 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
             <FormField label="Fotografija" required id="image-upload">
               <label
                 htmlFor="image-upload"
-                className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-[#f1f1e6] py-10 px-4 transition-colors hover:border-[var(--color-orange)] hover:bg-[var(--color-orange)]/5 focus-within:ring-2 focus-within:ring-[var(--color-orange)]/25"
+                className="flex cursor-pointer flex-col items-center justify-center rounded-none border-2 border-dashed border-gray-300 bg-[#f1f1e6] py-10 px-4 transition-colors hover:border-[var(--color-orange)] hover:bg-[var(--color-orange)]/5 focus-within:ring-2 focus-within:ring-[var(--color-orange)]/25"
               >
                 <input
                   ref={imageInputRef}
                   id="image-upload"
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={(e) => setImageFileWithPreview(e.target.files?.[0] ?? null)}
+                  onChange={(e) =>
+                    setImageFileWithPreview(e.target.files?.[0] ?? null)
+                  }
                   className="sr-only"
                 />
                 {imageFile && imagePreviewUrl ? (
                   <>
-                    <img
+                    <Image
                       src={imagePreviewUrl}
                       alt="Pregled"
-                      className="mb-2 max-h-32 rounded-lg object-cover"
+                      width={320}
+                      height={128}
+                      className="mb-2 max-h-32 rounded-none object-cover"
+                      unoptimized
                     />
                     <span className="text-sm font-medium text-[var(--color-primary)] truncate max-w-full px-2">
                       {imageFile.name}
@@ -645,7 +685,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   ta.style.height = `${Math.max(100, ta.scrollHeight)}px`;
                 }}
                 placeholder="Kratak opis jela..."
-                className={inputClass + " resize-none overflow-y-auto min-h-[100px]"}
+                className={
+                  inputClass + " resize-none overflow-y-auto min-h-[100px]"
+                }
               />
             </FormField>
           </Section>
@@ -656,7 +698,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
               {whyYoullLove.map((val, i) => (
                 <div key={i} className="flex gap-2 items-center flex-wrap">
                   <input
-                    ref={(el) => { whyYoullLoveRefs.current[i] = el; }}
+                    ref={(el) => {
+                      whyYoullLoveRefs.current[i] = el;
+                    }}
                     type="text"
                     value={val}
                     onChange={(e) => {
@@ -672,9 +716,11 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                     <button
                       type="button"
                       onClick={() =>
-                        setWhyYoullLove((prev) => prev.filter((_, j) => j !== i))
+                        setWhyYoullLove((prev) =>
+                          prev.filter((_, j) => j !== i),
+                        )
                       }
-                      className="shrink-0 rounded p-1.5 text-red-600 hover:bg-red-50"
+                      className="shrink-0 cursor-pointer rounded-none p-1.5 text-red-600 hover:bg-red-50"
                       aria-label="Ukloni"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -686,7 +732,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                       variant="outline"
                       size="icon"
                       onClick={() => setWhyYoullLove((prev) => [...prev, ""])}
-                      className="shrink-0 border-[var(--color-orange)] text-[var(--color-orange)] hover:bg-[var(--color-orange)]/10"
+                      className="shrink-0 cursor-pointer rounded-none border-[var(--color-orange)] text-[var(--color-orange)] hover:bg-[var(--color-orange)]/10"
                       aria-label="Dodaj tačku"
                     >
                       <Plus className="h-4 w-4" />
@@ -698,9 +744,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
           </Section>
 
           <Section title="Nutritivne vrednosti (opciono)">
-            <p className="mb-4 text-sm text-gray-500">
-              Po porciji.
-            </p>
+            <p className="mb-4 text-sm text-gray-500">Po porciji.</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Kalorije (kcal)">
                 <Input
@@ -710,7 +754,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   value={calories === "" ? "" : calories}
                   onChange={(e) =>
                     setCalories(
-                      e.target.value === "" ? "" : parseInt(e.target.value) || 0
+                      e.target.value === ""
+                        ? ""
+                        : parseInt(e.target.value) || 0,
                     )
                   }
                   className={inputClass}
@@ -725,7 +771,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   value={fatG === "" ? "" : fatG}
                   onChange={(e) =>
                     setFatG(
-                      e.target.value === "" ? "" : parseFloat(e.target.value) || 0
+                      e.target.value === ""
+                        ? ""
+                        : parseFloat(e.target.value) || 0,
                     )
                   }
                   className={inputClass}
@@ -740,7 +788,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   value={carbsG === "" ? "" : carbsG}
                   onChange={(e) =>
                     setCarbsG(
-                      e.target.value === "" ? "" : parseFloat(e.target.value) || 0
+                      e.target.value === ""
+                        ? ""
+                        : parseFloat(e.target.value) || 0,
                     )
                   }
                   className={inputClass}
@@ -755,7 +805,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   value={proteinG === "" ? "" : proteinG}
                   onChange={(e) =>
                     setProteinG(
-                      e.target.value === "" ? "" : parseFloat(e.target.value) || 0
+                      e.target.value === ""
+                        ? ""
+                        : parseFloat(e.target.value) || 0,
                     )
                   }
                   className={inputClass}
@@ -775,7 +827,10 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                 required
                 value={categoryId}
                 onChange={setCategoryId}
-                options={mealCategories.map((c) => ({ value: c.id, label: c.name_sr }))}
+                options={mealCategories.map((c) => ({
+                  value: c.id,
+                  label: c.name_sr,
+                }))}
                 placeholder="Izaberite kategoriju"
               />
               <CustomSelect
@@ -783,7 +838,10 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                 label="Kuhinja (max jedna)"
                 value={cuisineId}
                 onChange={setCuisineId}
-                options={cuisineCategories.map((c) => ({ value: c.id, label: c.name_sr }))}
+                options={cuisineCategories.map((c) => ({
+                  value: c.id,
+                  label: c.name_sr,
+                }))}
                 placeholder="Izaberite kuhinju"
               />
             </div>
@@ -804,7 +862,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   className={inputClass}
                 />
               </FormField>
-              <FormField label="Kuvanje (min)" required>
+              <FormField label="Kuvanje (min)">
                 <Input
                   type="number"
                   min={0}
@@ -825,7 +883,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   value={servings === "" ? "" : servings}
                   onChange={(e) => {
                     const v = e.target.value;
-                    setServings(v === "" ? "" : Math.max(1, parseInt(v, 10) || 1));
+                    setServings(
+                      v === "" ? "" : Math.max(1, parseInt(v, 10) || 1),
+                    );
                   }}
                   className={inputClass}
                 />
@@ -835,17 +895,16 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
 
           <Section title="Sastojci">
             <p className="mb-3 text-sm text-gray-600">
-              Količina, jedinica i naziv. Najmanje jedan sastojak. Enter dodaje novi red i prelazi na njega.
+              Količina, jedinica i naziv. Najmanje jedan sastojak. Enter dodaje
+              novi red i prelazi na njega.
             </p>
             <div className="space-y-2">
               {ingredients.map((ing, i) => (
-                <div
-                  key={i}
-                  className="flex flex-wrap items-center gap-2"
-                >
+                <div key={i} className="flex flex-wrap items-center gap-2">
                   <input
                     ref={(el) => {
-                      if (!ingredientRefs.current[i]) ingredientRefs.current[i] = [];
+                      if (!ingredientRefs.current[i])
+                        ingredientRefs.current[i] = [];
                       ingredientRefs.current[i][0] = el;
                     }}
                     type="text"
@@ -859,7 +918,8 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   />
                   <input
                     ref={(el) => {
-                      if (!ingredientRefs.current[i]) ingredientRefs.current[i] = [];
+                      if (!ingredientRefs.current[i])
+                        ingredientRefs.current[i] = [];
                       ingredientRefs.current[i][1] = el;
                     }}
                     type="text"
@@ -873,7 +933,8 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                   />
                   <input
                     ref={(el) => {
-                      if (!ingredientRefs.current[i]) ingredientRefs.current[i] = [];
+                      if (!ingredientRefs.current[i])
+                        ingredientRefs.current[i] = [];
                       ingredientRefs.current[i][2] = el;
                     }}
                     type="text"
@@ -890,7 +951,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                     variant="ghost"
                     size="icon"
                     onClick={() => removeIngredient(i)}
-                    className="shrink-0 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    className="shrink-0 cursor-pointer rounded-none text-red-600 hover:bg-red-50 hover:text-red-700"
                     aria-label="Ukloni sastojak"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -901,7 +962,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                       variant="outline"
                       size="icon"
                       onClick={addIngredient}
-                      className="shrink-0 border-[var(--color-orange)] text-[var(--color-orange)] hover:bg-[var(--color-orange)]/10"
+                      className="shrink-0 cursor-pointer rounded-none border-[var(--color-orange)] text-[var(--color-orange)] hover:bg-[var(--color-orange)]/10"
                       aria-label="Dodaj sastojak"
                     >
                       <Plus className="h-4 w-4" />
@@ -914,7 +975,9 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
 
           <Section title="Koraci pripreme">
             <p className="mb-3 text-sm text-gray-600">
-              Najmanje jedan korak. Enter dodaje novi korak i prelazi na njega. Shift+Enter za novi red u koraku. Opciono dodajte sliku za svaki korak.
+              Najmanje jedan korak. Enter dodaje novi korak i prelazi na njega.
+              Shift+Enter za novi red u koraku. Opciono dodajte sliku za svaki
+              korak.
             </p>
             <div className="space-y-4">
               {directions.map((dir, i) => (
@@ -945,7 +1008,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => removeDirection(i)}
-                        className="shrink-0 mt-1 text-red-600 hover:bg-red-50 hover:text-red-700"
+                        className="shrink-0 cursor-pointer rounded-none mt-1 text-red-600 hover:bg-red-50 hover:text-red-700"
                         aria-label="Ukloni korak"
                       >
                         <Trash2 className="h-4 w-4" />
@@ -956,7 +1019,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                           variant="outline"
                           size="icon"
                           onClick={addDirection}
-                          className="shrink-0 mt-1 border-[var(--color-orange)] text-[var(--color-orange)] hover:bg-[var(--color-orange)]/10"
+                          className="shrink-0 cursor-pointer rounded-none mt-1 border-[var(--color-orange)] text-[var(--color-orange)] hover:bg-[var(--color-orange)]/10"
                           aria-label="Dodaj korak"
                         >
                           <Plus className="h-4 w-4" />
@@ -967,10 +1030,12 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                       <input
                         type="file"
                         accept="image/jpeg,image/png,image/webp,image/gif"
-                        onChange={(e) => setDirectionImage(i, e.target.files?.[0] ?? null)}
+                        onChange={(e) =>
+                          setDirectionImage(i, e.target.files?.[0] ?? null)
+                        }
                         className="sr-only"
                       />
-                      <span className="rounded-lg border-2 border-dashed border-gray-300 bg-[#f1f1e6] px-3 py-2 text-xs font-medium text-[var(--color-primary)] hover:border-[var(--color-orange)] hover:bg-[var(--color-orange)]/5 transition-colors">
+                      <span className="rounded-none border-2 border-dashed border-gray-300 bg-[#f1f1e6] px-3 py-2 text-xs font-medium text-[var(--color-primary)] hover:border-[var(--color-orange)] hover:bg-[var(--color-orange)]/5 transition-colors">
                         {dir.imageFile ? (
                           <span className="flex items-center gap-2">
                             <ImagePlus className="h-4 w-4 text-[var(--color-orange)]" />
@@ -981,7 +1046,7 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                                 e.preventDefault();
                                 setDirectionImage(i, null);
                               }}
-                              className="text-red-600 hover:underline"
+                              className="cursor-pointer text-red-600 hover:underline"
                             >
                               Ukloni
                             </button>
@@ -995,10 +1060,13 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
                       </span>
                     </label>
                     {dir.imagePreviewUrl && (
-                      <img
+                      <Image
                         src={dir.imagePreviewUrl}
                         alt={`Korak ${i + 1}`}
-                        className="mt-1 max-h-24 rounded-lg object-cover"
+                        width={320}
+                        height={96}
+                        className="mt-1 max-h-24 rounded-none object-cover"
+                        unoptimized
                       />
                     )}
                   </div>
@@ -1010,11 +1078,11 @@ export function AddRecipeForm({ userId, categories }: AddRecipeFormProps) {
       </div>
 
       {/* Full width footer */}
-      <div className="flex flex-col gap-4 rounded-2xl border-2 border-gray-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-center">
+      <div className="flex flex-col gap-4 rounded-none border-2 border-gray-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-center">
         <Button
           type="submit"
           disabled={loading}
-          className="w-full min-w-[200px] cursor-pointer rounded-xl bg-[var(--color-orange)] py-6 text-base font-semibold text-white hover:bg-[var(--ar-primary-hover)] disabled:opacity-50 sm:w-auto"
+          className="w-full min-w-[200px] cursor-pointer rounded-none border-2 border-[var(--color-primary)] bg-[var(--color-orange)] py-6 text-base font-semibold text-[var(--color-primary)] transition-transform duration-100 hover:scale-[1.02] hover:bg-[var(--color-orange)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] disabled:opacity-50 sm:w-auto"
         >
           {loading ? "Čuvanje..." : "Sačuvaj recept"}
         </Button>

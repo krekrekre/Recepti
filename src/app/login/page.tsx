@@ -47,58 +47,59 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-16">
+    <div className="flex min-h-[60vh] items-center justify-center px-4 py-16">
       {checkingAuth ? (
         <p className="text-[var(--ar-gray-500)]">Učitavanje...</p>
       ) : (
-        <>
-      <h1 className="text-2xl font-bold text-[var(--ar-gray-700)]">Prijava</h1>
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-        {error && (
-          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
-            {error}
-          </div>
-        )}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-[var(--ar-gray-700)]">
-            Email
-          </label>
-          <Input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 h-11 rounded-xl"
-          />
+        <div className="auth-form-card w-full max-w-[400px]">
+          <h1 className="auth-form-title">Prijava</h1>
+          <form onSubmit={handleSubmit} className="auth-form">
+            {error && (
+              <div className="auth-form-error" role="alert">
+                {error}
+              </div>
+            )}
+            <div className="auth-form-field">
+              <label htmlFor="email" className="auth-form-label">
+                Email
+              </label>
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="auth-form-input"
+                placeholder="vas@email.com"
+              />
+            </div>
+            <div className="auth-form-field">
+              <label htmlFor="password" className="auth-form-label">
+                Lozinka
+              </label>
+              <Input
+                id="password"
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="auth-form-input"
+              />
+            </div>
+            <Button type="submit" disabled={loading} className="auth-form-submit">
+              {loading ? "Prijava..." : "Prijavi se"}
+            </Button>
+          </form>
+          <p className="auth-form-footer">
+            Nemate nalog?{" "}
+            <Link href="/signup" className="auth-form-link">
+              Registruj se
+            </Link>
+          </p>
+          <Link href="/" className="auth-form-back">
+            ← Nazad na početnu
+          </Link>
         </div>
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-[var(--ar-gray-700)]">
-            Lozinka
-          </label>
-          <Input
-            id="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 h-11 rounded-xl"
-          />
-        </div>
-        <Button type="submit" disabled={loading} className="h-11 w-full rounded-xl">
-          {loading ? "Prijava..." : "Prijavi se"}
-        </Button>
-      </form>
-      <p className="mt-4 text-center text-sm text-[var(--ar-gray-500)]">
-        Nemate nalog?{" "}
-        <Link href="/signup" className="font-medium text-[var(--ar-primary)] hover:underline">
-          Registruj se
-        </Link>
-      </p>
-      <Link href="/" className="mt-4 block text-center text-sm text-[var(--ar-gray-500)] hover:text-[var(--ar-primary)]">
-        ← Nazad na početnu
-      </Link>
-        </>
       )}
     </div>
   );

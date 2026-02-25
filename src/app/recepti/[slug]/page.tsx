@@ -5,11 +5,17 @@ import { PLACEHOLDER_IMAGES } from "@/lib/constants";
 import { getRecipeBySlug, getRelatedRecipes } from "@/lib/queries/recipes";
 import { RecipeActions } from "@/components/RecipeActions";
 import { ServingMultiplier } from "@/components/ServingMultiplier";
-import { createClient } from "@/lib/supabase/server";
 import type { Direction } from "@/types";
 import { getRecipeMetadata } from "@/lib/seo";
 import { RecipeSchema } from "@/components/RecipeSchema";
 import { RecipeCard } from "@/components/RecipeCard";
+import { RecipeReviewSection } from "@/components/RecipeReviewSection";
+
+const SKILL_LEVEL_LABELS: Record<string, string> = {
+  lako: "Lako",
+  srednje: "Srednje",
+  tesko: "Teško",
+};
 
 function getCategoriesFromRecipe(recipe: {
   recipe_categories?: Array<{
@@ -50,10 +56,6 @@ export default async function RecipePage({
   const { slug } = await params;
   const recipe = await getRecipeBySlug(slug);
   if (!recipe) notFound();
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const categoryIds = (recipe.recipe_categories || [])
     .map(
@@ -76,7 +78,7 @@ export default async function RecipePage({
       <div className="min-h-screen bg-[#ffffff]">
         <div className="mx-auto max-w-[1060px] px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 gap-8 lg:gap-[96px] lg:[grid-template-columns:600px_300px]">
-            <article className="min-w-0 border-b border-[var(--ar-gray-200)] bg-[#ffffff] py-8 sm:py-10">
+            <article className="min-w-0 bg-[#ffffff] py-8 sm:py-10">
               <nav
                 className="text-xs uppercase tracking-wide text-[var(--ar-gray-700)] sm:text-sm"
                 aria-label="Breadcrumb"
@@ -109,14 +111,6 @@ export default async function RecipePage({
 
               <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
                 {/* TODO: restore rating stars and review count – see future.md */}
-                <span>
-                  Ažurirano{" "}
-                  {new Date(recipe.updated_at).toLocaleDateString("sr-RS", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
               </div>
 
               {recipe.description_sr && (
@@ -125,27 +119,26 @@ export default async function RecipePage({
                 </p>
               )}
 
-              {recipe.author_name && (
-                <div className="mt-2 flex items-center gap-2 text-sm text-[var(--ar-gray-600)]">
-                  By{" "}
-                  <Link
-                    href="#"
-                    className="font-medium text-[var(--ar-gray-700)] underline hover:no-underline"
-                  >
-                    {recipe.author_name}
-                  </Link>
-                </div>
-              )}
+              <div className="mt-2 pt-1 text-sm text-[var(--ar-gray-600)]">
+                Autor:{" "}
+                <span className="font-medium text-[var(--ar-gray-700)]">
+                  {recipe.author_name || "Domaći kuvar"}
+                </span>
+                <span className="mx-3 inline-block">•</span>
+                Ažurirano:{" "}
+                <span className="font-medium text-[var(--ar-gray-700)]">
+                  {new Date(recipe.updated_at).toLocaleDateString("sr-RS", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
+              </div>
 
               <RecipeActions
                 recipeId={recipe.id}
                 slug={slug}
                 title={recipe.title_sr}
-                editHref={
-                  user?.id && recipe.author_id === user.id
-                    ? `/admin/recepti/${slug}/izmeni`
-                    : null
-                }
               />
               <div className="relative mt-6 aspect-[4/3] overflow-hidden shadow-[var(--ar-card-shadow)]">
                 <Image
@@ -156,40 +149,44 @@ export default async function RecipePage({
                   priority
                 />
               </div>
-              <div className="mt-6 overflow-hidden border border-[color:color-mix(in_srgb,black_20%,transparent)] border-t-12 border-t-[color:color-mix(in_srgb,#F4942F_20%,transparent)] bg-[#ffffff] p-4 sm:p-6">
-                <div className="flex flex-wrap justify-between gap-x-10 gap-y-4">
+              <div className="mt-6 overflow-hidden border border-[color:color-mix(in_srgb,black_20%,transparent)] border-t-12 border-t-[color:color-mix(in_srgb,#46deb6_20%,transparent)] bg-[#ffffff] p-4 sm:p-6">
+                <div className="grid grid-cols-3 gap-x-10 gap-y-4">
                   <div>
                     <p className="text-sm font-bold text-[var(--ar-gray-900)]">
-                      Vreme pripreme:
+                      Aktivno vreme:
                     </p>
                     <p className="text-sm font-normal text-[var(--ar-gray-700)]">
                       {recipe.prep_time_minutes} min
                     </p>
                   </div>
+                  {recipe.cook_time_minutes > 0 && (
+                    <div>
+                      <p className="text-sm font-bold text-[var(--ar-gray-900)]">
+                        Ukupno vreme:
+                      </p>
+                      <p className="text-sm font-normal text-[var(--ar-gray-700)]">
+                        {totalTime} min
+                      </p>
+                    </div>
+                  )}
                   <div>
                     <p className="text-sm font-bold text-[var(--ar-gray-900)]">
-                      Vreme kuvanja:
+                      Porcije:
                     </p>
                     <p className="text-sm font-normal text-[var(--ar-gray-700)]">
-                      {recipe.cook_time_minutes} min
+                      {recipe.servings}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-bold text-[var(--ar-gray-900)]">
-                      Ukupno vreme:
+                      Težina:
                     </p>
                     <p className="text-sm font-normal text-[var(--ar-gray-700)]">
-                      {totalTime} min
+                      {recipe.skill_level
+                        ? SKILL_LEVEL_LABELS[recipe.skill_level] ?? recipe.skill_level
+                        : "—"}
                     </p>
                   </div>
-                </div>
-                <div className="mt-4">
-                  <p className="text-sm font-bold text-[var(--ar-gray-900)]">
-                    Porcije:
-                  </p>
-                  <p className="text-sm font-normal text-[var(--ar-gray-700)]">
-                    {recipe.servings}
-                  </p>
                 </div>
                 <hr className="my-4 border-[color:color-mix(in_srgb,black_20%,transparent)]" />
                 {recipe.recipe_nutrition && (
@@ -327,7 +324,11 @@ export default async function RecipePage({
                   </div>
                 </div>
               )}
-              {/* TODO: restore rating and reviews – see future.md */}
+              <RecipeReviewSection
+                recipeId={recipe.id}
+                recipeTitle={recipe.title_sr}
+                reviewCount={recipe.review_count ?? 0}
+              />
             </article>
 
             {/* Right column: ads (300px) - only beside main article */}
@@ -341,7 +342,12 @@ export default async function RecipePage({
 
         {/* Takođe će vam se svideti - full width, max 1220px, no ad column */}
         {related.length > 0 && (
-          <div className="border-t border-[var(--ar-gray-200)] bg-[#ffffff] py-10 sm:py-12">
+          <div
+            className="py-10 sm:py-12"
+            style={{
+              background: "linear-gradient(to bottom, #ffffff 0%, #ffffff 20%, #f1f1e6 20%, #f1f1e6 100%)",
+            }}
+          >
             <div className="mx-auto max-w-[1220px] px-4 sm:px-6 lg:px-8">
               <h2 className="text-xl font-semibold text-[var(--ar-gray-700)]">
                 Takođe će vam se svideti

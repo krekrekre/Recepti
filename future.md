@@ -1,3 +1,6 @@
+# Future Tasks
+
+- Re-add `Štampaj` button in `RecipeActions` when print flow is fully designed and tested.
 # Future / TODO
 
 ## Recipe page – bring back rating and reviews

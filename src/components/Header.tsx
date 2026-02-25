@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { Search, Heart, User, LogOut, ChevronDown, ChevronRight, PlusCircle, Menu, X } from "lucide-react";
+import {
+  Search,
+  Heart,
+  User,
+  LogOut,
+  ChevronDown,
+  ChevronRight,
+  PlusCircle,
+  Menu,
+  X,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { TRUST_BADGE, SITE_NAME, STATS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -22,18 +31,19 @@ interface HeaderProps {
 
 function Logo() {
   return (
-    <Link href="/" className="site-logo flex items-center gap-0.5 group cursor-pointer">
-      <span className="text-[40px] font-medium tracking-tight">
-        {SITE_NAME.toLowerCase()}
+    <Link
+      href="/"
+      className="site-logo group inline-flex items-center gap-1 cursor-pointer text-red-600"
+    >
+      <span className="text-[42px] font-semibold leading-none tracking-tight">
+        Zalogajko
       </span>
-      <svg
-        viewBox="0 0 24 24"
-        className="w-7 h-7 -mt-1"
-        fill="currentColor"
+      <span
+        className="-mt-1 inline-block text-[42px] leading-none -rotate-[30deg]"
+        aria-hidden
       >
-        <path d="M12 2C12 2 12 6 13 8C14 10 16 11 16 14C16 17 14 19 12 20C12 20 12 22 12 22C17 22 21 18 21 13C21 8 17 4 12 2Z" />
-        <circle cx="12" cy="2.5" r="2" />
-      </svg>
+        🍲
+      </span>
     </Link>
   );
 }
@@ -67,7 +77,10 @@ function HeaderUserBlock() {
   useEffect(() => {
     if (!accountOpen) return;
     function handleClickOutside(e: MouseEvent) {
-      if (accountRef.current && !accountRef.current.contains(e.target as Node)) {
+      if (
+        accountRef.current &&
+        !accountRef.current.contains(e.target as Node)
+      ) {
         setAccountOpen(false);
       }
     }
@@ -83,7 +96,10 @@ function HeaderUserBlock() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 ml-2 h-9 w-20 bg-[var(--ar-gray-200)] rounded animate-pulse" aria-hidden />
+      <div
+        className="flex items-center gap-2 ml-2 h-9 w-20 bg-[var(--ar-gray-200)] rounded animate-pulse"
+        aria-hidden
+      />
     );
   }
 
@@ -93,9 +109,9 @@ function HeaderUserBlock() {
         <Button
           asChild
           size="sm"
-          className="bg-[var(--color-orange)] hover:bg-[var(--ar-primary-hover)] text-white text-[13px] cursor-pointer"
+          className="rounded-none bg-[var(--color-orange)] hover:bg-[var(--ar-primary-hover)] text-white text-[13px] cursor-pointer"
         >
-          <Link href="/admin/recepti/novo">
+          <Link href="/recepti/novo">
             <PlusCircle className="w-4 h-4 mr-1" />
             Novi recept
           </Link>
@@ -105,13 +121,15 @@ function HeaderUserBlock() {
             variant="ghost"
             size="sm"
             onClick={() => setAccountOpen((o) => !o)}
-            className="text-[#2a2c41] text-[13px] font-normal cursor-pointer border border-[var(--color-orange)] focus:ring-2 focus:ring-[var(--color-orange)] focus:ring-offset-1"
+            className="rounded-none text-[#2a2c41] text-[13px] font-normal cursor-pointer border border-[var(--color-orange)] focus:ring-2 focus:ring-[var(--color-orange)] focus:ring-offset-1"
             aria-expanded={accountOpen}
             aria-haspopup="true"
           >
             <User className="w-4 h-4 mr-1" />
             Nalog
-            <ChevronDown className={`w-4 h-4 ml-0.5 transition-transform ${accountOpen ? "rotate-180" : ""}`} />
+            <ChevronDown
+              className={`w-4 h-4 ml-0.5 transition-transform ${accountOpen ? "rotate-180" : ""}`}
+            />
           </Button>
           {accountOpen && (
             <div
@@ -171,7 +189,7 @@ function HeaderUserBlock() {
         asChild
         variant="ghost"
         size="sm"
-        className="text-[#2a2c41] text-[13px] font-normal cursor-pointer"
+        className="rounded-none text-[#2a2c41] text-[13px] font-normal cursor-pointer"
       >
         <Link href="/login">
           <User className="w-4 h-4 mr-1" />
@@ -219,41 +237,44 @@ function NavDropdown({
   };
 
   return (
-    <li className="relative" onMouseEnter={handleEnter} onMouseLeave={scheduleClose}>
-        <Link
-          href={href}
-          className={`flex items-center ${navLinkBase} ${
-            open
-              ? "text-[var(--color-orange)]"
-              : "text-[var(--color-primary)] hover:text-[var(--color-orange)]"
-          }`}
+    <li
+      className="relative"
+      onMouseEnter={handleEnter}
+      onMouseLeave={scheduleClose}
+    >
+      <Link
+        href={href}
+        className={`flex items-center ${navLinkBase} ${
+          open
+            ? "text-[var(--color-orange)]"
+            : "text-[var(--color-primary)] hover:text-[var(--color-orange)]"
+        }`}
+      >
+        <span
+          className={`${navLinkUnderline} ${open ? "!border-[var(--color-orange)]" : ""}`}
         >
-          <span
-            className={`${navLinkUnderline} ${open ? "!border-[var(--color-orange)]" : ""}`}
-          >
-            {label}
-          </span>
-        </Link>
-        {open && (
-          <ul
-            className="absolute left-0 top-full pt-2 z-[100] min-w-[220px] max-h-[70vh] overflow-y-auto border border-[var(--ar-gray-200)] bg-white py-1 shadow-xl list-none m-0 p-0"
-            onMouseEnter={clearCloseTimer}
-            onMouseLeave={scheduleClose}
-          >
-            {children}
-          </ul>
-        )}
+          {label}
+        </span>
+      </Link>
+      {open && (
+        <ul
+          className="absolute left-0 top-full pt-2 z-[100] min-w-[220px] max-h-[70vh] overflow-y-auto border border-[var(--ar-gray-200)] bg-white py-1 shadow-xl list-none m-0 p-0"
+          onMouseEnter={clearCloseTimer}
+          onMouseLeave={scheduleClose}
+        >
+          {children}
+        </ul>
+      )}
     </li>
   );
 }
 
 export function Header({ categories, ingredients }: HeaderProps) {
-  const [recipeCount] = useState(51000);
-  const [ratingCount] = useState("7M+");
-  const [cookCount] = useState("67M");
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileOpenSection, setMobileOpenSection] = useState<"recepti" | "sastojci" | "kuhinja" | null>(null);
+  const [mobileOpenSection, setMobileOpenSection] = useState<
+    "recepti" | "sastojci" | "kuhinja" | null
+  >(null);
 
   const mealCategories = categories.filter((c) => c.type === "meal_type");
   const cuisineCategories = categories.filter((c) => c.type === "cuisine");
@@ -303,11 +324,11 @@ export function Header({ categories, ingredients }: HeaderProps) {
                   type="search"
                   name="sastojak"
                   placeholder="Pronađite recept ili sastojak"
-                  className="h-10 w-full rounded-md border border-gray-300 bg-white pl-4 pr-24 text-[14px] focus:border-[var(--color-orange)] focus:ring-1 focus:ring-[var(--color-orange)]"
+                  className="h-10 w-full rounded-none border border-gray-300 bg-white pl-4 pr-24 text-[14px] selection:bg-[var(--color-orange)] selection:text-[var(--color-primary)] focus-visible:border-[var(--color-orange)] focus-visible:ring-2 focus-visible:ring-[var(--color-orange)]/25 outline-none"
                 />
                 <Button
                   type="submit"
-                  className="absolute right-0 top-0 h-10 rounded-l-none rounded-r-md bg-[var(--color-orange)] hover:bg-[var(--ar-primary-hover)] px-4"
+                  className="absolute right-0 top-0 h-10 cursor-pointer rounded-none bg-[var(--color-orange)] hover:bg-[var(--ar-primary-hover)] px-4"
                 >
                   <Search className="w-4 h-4" />
                 </Button>
@@ -339,7 +360,11 @@ export function Header({ categories, ingredients }: HeaderProps) {
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-main-menu"
             >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
           </div>
         </div>
@@ -366,31 +391,35 @@ export function Header({ categories, ingredients }: HeaderProps) {
               <Link
                 href="/"
                 onClick={closeMobileMenu}
-                className="inline-flex items-center gap-0.5 text-[var(--color-orange)]"
+                className="inline-flex items-center gap-1 text-red-600"
               >
-                <span className="text-[38px] font-medium leading-none tracking-tight">
-                  {SITE_NAME.toLowerCase()}
+                <span className="text-[38px] font-semibold leading-none tracking-tight">
+                  Zalogajko
                 </span>
-                <svg viewBox="0 0 24 24" className="h-6 w-6 -mt-0.5" fill="currentColor">
-                  <path d="M12 2C12 2 12 6 13 8C14 10 16 11 16 14C16 17 14 19 12 20C12 20 12 22 12 22C17 22 21 18 21 13C21 8 17 4 12 2Z" />
-                  <circle cx="12" cy="2.5" r="2" />
-                </svg>
+                <span
+                  className="-mt-1 inline-block text-[30px] leading-none -rotate-[30deg]"
+                  aria-hidden
+                >
+                  🍲
+                </span>
               </Link>
             </div>
           </div>
 
           <div className="px-3 py-5">
-            <p className="mb-2 text-[30px] font-semibold text-[var(--ar-gray-900)]">Search</p>
+            <p className="mb-2 text-[30px] font-semibold text-[var(--ar-gray-900)]">
+              Search
+            </p>
             <form action="/recepti" method="GET" className="relative">
               <Input
                 type="search"
                 name="sastojak"
                 placeholder="Pronađite recept ili sastojak"
-                className="h-12 w-full rounded-none border border-[var(--ar-gray-500)] bg-white pl-4 pr-14 text-base focus:border-[var(--color-orange)] focus:ring-0"
+                className="h-12 w-full rounded-none border border-[var(--ar-gray-500)] bg-white pl-4 pr-14 text-base selection:bg-[var(--color-orange)] selection:text-[var(--color-primary)] focus-visible:border-[var(--color-orange)] focus-visible:ring-2 focus-visible:ring-[var(--color-orange)]/25 outline-none"
               />
               <Button
                 type="submit"
-                className="absolute right-0 top-0 h-12 w-12 rounded-none bg-[var(--color-orange)] p-0 hover:bg-[var(--ar-primary-hover)]"
+                className="absolute right-0 top-0 h-12 w-12 cursor-pointer rounded-none bg-[var(--color-orange)] p-0 hover:bg-[var(--ar-primary-hover)]"
               >
                 <Search className="h-5 w-5" />
               </Button>
@@ -581,7 +610,7 @@ export function Header({ categories, ingredients }: HeaderProps) {
       )}
 
       {/* Main navigation - dropdowns (hover) */}
-      <nav className="relative hidden md:block">
+      <nav className="relative hidden md:block mb-8 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.08),0_2px_4px_-2px_rgba(0,0,0,0.06)]">
         <div className="mx-auto max-w-[1284px] px-4 sm:px-6 lg:px-8">
           <ul className="flex items-center gap-1 list-none m-0 p-0">
             <NavDropdown
@@ -705,36 +734,6 @@ export function Header({ categories, ingredients }: HeaderProps) {
           </ul>
         </div>
       </nav>
-
-      {/* Trust banner */}
-      <div className="trust-banner bg-[#005699]">
-        <div className="mx-auto max-w-[1284px] px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-between py-3 text-[17px]">
-            <p className="font-medium font-dynapuff">
-              <span>{TRUST_BADGE}</span>
-            </p>
-            <div className="flex items-center gap-6 font-dynapuff">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 bg-green-400 rounded-full"></span>
-                <span className="font-bold">
-                  {recipeCount.toLocaleString()}
-                </span>{" "}
-                <span>Originalnih Recepta</span>
-              </span>
-              <span className="hidden sm:flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 bg-orange-400 rounded-full"></span>
-                <span className="font-bold">{ratingCount}</span>
-                <span>Ocena & Komentara</span>
-              </span>
-              <span className="hidden md:flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 bg-yellow-400 rounded-full"></span>
-                <span className="font-bold">{cookCount}</span>
-                <span>{STATS.cooks}</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
     </header>
   );
 }
